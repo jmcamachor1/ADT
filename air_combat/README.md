@@ -1,3 +1,3 @@
-### SIMULTANEOUS N-STAGE GAME
+### Simultaneous n-stage games
 
 Code for Air Combat example. 
