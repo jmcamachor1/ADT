@@ -336,7 +336,7 @@ def compute_A2_theta1_d1_a1(iters,
                                     burnin_= burnin_, 
                                     n_jobs = n_jobs)
                     
-                    p = (np.bincount(np.array(mode_list).astype('int'), minlength=len(a2_values)) /iters)[1:]
+                    p = (np.bincount(np.array(mode_list).astype('int'), minlength=len(a2_values)+1) /iters)[1:]
 
                     d1_aux[a1] = {'p':list(p), 'dist':list(mode_list)}
             theta1_aux[d1] = d1_aux    
@@ -657,7 +657,7 @@ def compute_A1(iters, a1_values, a2_values, A2_theta1_d1_a1, N_inner_=1000, burn
                     burning = burnin_, 
                     n_jobs = n_jobs)
     
-    p = (np.bincount(np.array(mode_list).astype('int'), minlength=len(a1_values)) /iters)[1:]
+    p = (np.bincount(np.array(mode_list).astype('int'), minlength=len(a1_values)+1) /iters)[1:]
 
 
     return  {'p':list(p), 'dist':list(mode_list)}

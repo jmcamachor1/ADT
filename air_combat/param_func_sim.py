@@ -400,7 +400,7 @@ def pDtheta2():  #### CHECK
     ### ----------------------HIGH DEFENSE------------###
     params_d3 = {}
     #### NO ATTACK
-    params_d3[3] = {'p0':1, 'p1':0}
+    params_d3[1] = {'p0':1, 'p1':0}
     ### LOW ATTACK
     params_d3[2] = {'p0':0.70, 'p1':0.30}
     ### HIGH ATTACK

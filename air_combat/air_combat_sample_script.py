@@ -1,22 +1,16 @@
 import time, json, os
 from sim_dm_problem_func import *
 
-
 ### params 
-n_iters = ###
+n_iters = #####
 N_inner_ite = ####
 n_proc = ####
 dir_save = 'results/' 
 
-
-for c_ in []:
-    
-    start = time.time()
-
-    uD_with_fix_c = partial(uD  ,c = c_)
+start = time.time()
 
 
-    A2_star_theta1_d1_a1  = compute_A2_theta1_d1_a1(iters = n_iters,
+A2_star_theta1_d1_a1  = compute_A2_theta1_d1_a1(iters = n_iters,
                                 d1_values = [1,2,3],
                                 theta1_values = [0,1],
                                 a1_values = [1,2,3],
@@ -24,6 +18,21 @@ for c_ in []:
                                 N_inner_= N_inner_ite, 
                                 burnin_=0.75, 
                                 n_jobs = n_proc)
+
+
+A1_star = compute_A1(iters =n_iters,
+               a1_values = [1,2,3], 
+               a2_values = [1,2,3], 
+               A2_theta1_d1_a1 = A2_star_theta1_d1_a1, 
+               N_inner_= N_inner_ite, 
+             burnin_=0.75, 
+            n_jobs = n_proc)
+
+
+for c_ in [1,2]:
+    
+
+    uD_with_fix_c = partial(uD  ,c = c_)
 
     params_D_theta2 = pDtheta2()
     theta2_sample_D = partial(theta2_sample, params = params_D_theta2)
@@ -40,13 +49,6 @@ for c_ in []:
                                     burning = 0.75,
                                     n_jobs_ = n_proc)
 
-    A1_star = compute_A1(iters =n_iters,
-               a1_values = [1,2,3], 
-               a2_values = [1,2,3], 
-               A2_theta1_d1_a1 = A2_star_theta1_d1_a1, 
-               N_inner_= N_inner_ite, 
-             burnin_=0.75, 
-            n_jobs = n_proc)
 
 
     params_D_theta1 = pDtheta1()
@@ -65,25 +67,22 @@ for c_ in []:
                  burnin = 0.75)
 
 
-    exp_file = '_c_'+str(c_)+'_iters_'+str(n_iters)+'_N_inner_iters_'+str(N_inner_ite)
+    exp_file = '_iters_'+str(n_iters)+'_N_inner_iters_'+str(N_inner_ite)
 
-    with open(dir_save+'A2_star_theta1_d1_a1'+exp_file+'.json', 'w') as f:
-        json.dump(str(A2_star_theta1_d1_a1), f)
-
-    with open(dir_save + 'D2_star_theta1_d1_a1'+exp_file+'.json', 'w') as f:
+    with open(dir_save + 'D2_star_theta1_d1_a1'+exp_file+'_c_'+str(c_)+'.json', 'w') as f:
         json.dump(str(D2_star_theta1_d1_a1), f)
     
-    with open(dir_save + 'A1_star'+exp_file+'.json', 'w') as f:
-        json.dump(str(A1_star), f)
-    
-    with open(dir_save+'D1_star'+exp_file+'.json', 'w') as f:
+    with open(dir_save+'D1_star'+exp_file+'_c_'+str(c_)+'.json', 'w') as f:
         json.dump(str(D1_star), f)
 
+    
+with open(dir_save+'A2_star_theta1_d1_a1'+exp_file+'.json', 'w') as f:
+        json.dump(str(A2_star_theta1_d1_a1), f)
+
+with open(dir_save + 'A1_star'+exp_file+'.json', 'w') as f:
+        json.dump(str(A1_star), f)
+
         
-        
-    end = time.time()
+end = time.time()
 
-    print(exp_file,',TIME:',end-start)
-
-
-
+print(' TOTAL TIME:',end-start)
