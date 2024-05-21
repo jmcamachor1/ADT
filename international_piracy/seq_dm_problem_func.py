@@ -126,57 +126,6 @@ def propose(x_given, x_values):
     p=[0.5, 0.5]) )
 
 
-""""
-def generate_df_uD(c):
-  
-  ## Generate dataframe with all the possible utilities of the Defender
-
-  l = []
-  d1_l = [1,2,3,4]
-  d2_l = [1,2,3]
-  a1_l = [0,1,2,3,4]
-  theta_l = [0,1]
-
-  for d1 in d1_l:
-    for d2 in d2_l:
-      for theta in theta_l:
-        for a1 in a1_l:
-            #l.append({'d1':d1, 'd2':d2, 'theta':theta, 'uD': uD(d1 = d1,
-            #                                        theta = theta,
-            #                                        d2= d2,
-            #                                        a1 = a1,
-            #
-            #                                         c = c)[0]})
-            
-            
-            l.append({'d1':d1, 'd2':d2, 'theta':theta, 'cD': cD(d1 = d1, theta = theta,d2 = d2,a1 =a1)})
-
-  return pd.DataFrame(l)
-
-
-
-
-def APS_D2(d1, theta, c, a1):
-
-    ### COMPUTE OPTIMAL DECISION D2 given D1 and THETA; 
-    ## FOR OUR INTERNATIONAL PIRACY PROBLEM IS DETERMINISTIC
-    ### PARAMS: d1 -> Integer theta-> integer c-> float
-    
-    if a1 == 0:
-       print('1st')
-       d2 = 1
-    elif theta ==0:
-       print('2nd')
-       d2 = 1
-    elif a1 >1:
-        print('3nd')
-        d2 = 1
-    else:
-        print('4')
-        df = generate_df_uD(c)
-        d2 = argmax_d2 = df[(df['d1']==d1) & (df['theta']==theta)].sort_values(by='uD', ascending=False).iloc[0]['d2']
-    return df[(df['d1']==d1) & (df['theta']==theta)].sort_values(by='uD', ascending=False)
-"""
 
 def APS_D2(d1, theta, a1, c = 100000):
   
