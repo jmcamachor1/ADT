@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def cD(d1, theta, d2):
+def cD(d1, theta, d2, a1):
   """
   Computes the monetary value depending on d1, d2 and theta
 
@@ -14,7 +14,8 @@ def cD(d1, theta, d2):
     Variable indicating if attack is succeful
   d2: Integer
     2nd Defender's decision
-
+  a1: Integer
+    1st Attacker decision
    Returns
     Float: Monetary value of consequnces of d1, theta and d2
 
@@ -34,6 +35,8 @@ def cD(d1, theta, d2):
   {'d1':4,'theta': 'NA' ,'d2':'NA','cD':0.5}]
 
   cD_df = pd.DataFrame(cD_arr)
+  if a1 !=1:
+    theta = 0
   if d1 ==4:
     cD_value = cD_df[cD_df['d1']==d1]['cD'].values[0]
   else:
@@ -65,7 +68,7 @@ def cA(a1, theta, d2, d1):
         Float: Monetary value of consequnces of a1, theta and d2
     """
     if (a1 == 1) & (d1==4):
-      cA_value = 0
+      cA_value = -10
     else:
       aD_arr = [{'a1': 0,'theta': 'NA','d2':'NA', 'cA': 0},
                 {'a1': 'ATT','theta': 1,'d2':1, 'cA':0.97},

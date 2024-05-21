@@ -6,7 +6,7 @@ from joblib import Parallel, delayed
 from param_func import cD, cA, pDtheta ,pAtheta_sample, UA_sample, pAd2_sample
 
 
-def uD(d1, theta, d2,  c):
+def uD(d1, theta, d2,  c, a1):
     """
     Computes the Defender's utility depending on d1, d2 and theta
 
@@ -18,6 +18,8 @@ def uD(d1, theta, d2,  c):
         Variable indicating if attack is succeful
     d2: Integer
         2nd Defender's decision
+    a1: Integer 
+        1st Attacker's decision
     c: Float
         Risk averse coefficient
 
@@ -28,7 +30,7 @@ def uD(d1, theta, d2,  c):
 
     alpha_D = np.exp(c* 20) ## remain utility positive
 
-    return - np.exp([c * cD(d1, theta, d2)]) + alpha_D
+    return - np.exp([c * cD(d1 = d1, theta = theta, d2  = d2, a1 = a1)]) + alpha_D
 
 
 def ua_sample(a1,theta,d2,d1,params):
@@ -124,6 +126,7 @@ def propose(x_given, x_values):
     p=[0.5, 0.5]) )
 
 
+""""
 def generate_df_uD(c):
   
   ## Generate dataframe with all the possible utilities of the Defender
@@ -131,27 +134,80 @@ def generate_df_uD(c):
   l = []
   d1_l = [1,2,3,4]
   d2_l = [1,2,3]
+  a1_l = [0,1,2,3,4]
   theta_l = [0,1]
 
   for d1 in d1_l:
     for d2 in d2_l:
       for theta in theta_l:
-        l.append({'d1':d1, 'd2':d2, 'theta':theta, 'uD': uD(d1 = d1,
-                                                   theta = theta,
-                                                   d2= d2,
-                                                   c = c)[0]})
+        for a1 in a1_l:
+            #l.append({'d1':d1, 'd2':d2, 'theta':theta, 'uD': uD(d1 = d1,
+            #                                        theta = theta,
+            #                                        d2= d2,
+            #                                        a1 = a1,
+            #
+            #                                         c = c)[0]})
+            
+            
+            l.append({'d1':d1, 'd2':d2, 'theta':theta, 'cD': cD(d1 = d1, theta = theta,d2 = d2,a1 =a1)})
+
   return pd.DataFrame(l)
 
 
-def APS_D2(d1, theta, c):
+
+
+def APS_D2(d1, theta, c, a1):
 
     ### COMPUTE OPTIMAL DECISION D2 given D1 and THETA; 
     ## FOR OUR INTERNATIONAL PIRACY PROBLEM IS DETERMINISTIC
     ### PARAMS: d1 -> Integer theta-> integer c-> float
+    
+    if a1 == 0:
+       print('1st')
+       d2 = 1
+    elif theta ==0:
+       print('2nd')
+       d2 = 1
+    elif a1 >1:
+        print('3nd')
+        d2 = 1
+    else:
+        print('4')
+        df = generate_df_uD(c)
+        d2 = argmax_d2 = df[(df['d1']==d1) & (df['theta']==theta)].sort_values(by='uD', ascending=False).iloc[0]['d2']
+    return df[(df['d1']==d1) & (df['theta']==theta)].sort_values(by='uD', ascending=False)
+"""
 
-    df = generate_df_uD(c)
-    argmax_d2 = df[(df['d1']==d1) & (df['theta']==theta)].sort_values(by='uD', ascending=False).iloc[0]['d2']
-    return argmax_d2
+def APS_D2(d1, theta, a1, c = 100000):
+  
+  cD_arr = [{'d1':1,'theta':1,'d2':1,'cD':15.16},
+  {'d1': 1,'theta':1,'d2':2,'cD':2.3},
+  {'d1':1,'theta':1,'d2':3,'cD':4.28},
+  {'d1':1,'theta': 0,'d2':'NA','cD':0},
+  {'d1': 2,'theta':1,'d2':1,'cD':17.25},
+  {'d1':2,'theta':1,'d2':2,'cD':4.39},
+  {'d1':2,'theta':1,'d2':3,'cD':6.37},
+  {'d1':2,'theta':0,'d2':'NA','cD':0.05},
+  {'d1':3,'theta':1,'d2':1,'cD':19.39},
+  {'d1':3,'theta':1,'d2':2,'cD':6.53},
+  {'d1':3,'theta':1,'d2':3,'cD':8.51},
+  {'d1':3,'theta':0 ,'d2': 'NA','cD':0.15},
+  {'d1':4,'theta': 'NA' ,'d2':'NA','cD':0.5}]
+
+  cD_df = pd.DataFrame(cD_arr)
+  if a1 !=1:
+    theta = 0
+    d2 = 1
+  if d1 ==4:
+    d2 = 1
+  else:
+    if theta == 0:
+        d2 = 1
+    else:
+        d2 = cD_df[(cD_df['d1']==d1)&(cD_df['theta']==theta)].sort_values(by='cD', ascending=True).values[0][2]
+
+  return d2
+
 
 
 def inner_APS_A(d_given, a_values, a_util, theta, d2,  N_inner=1000, burnin=0.75):
@@ -284,7 +340,7 @@ def inner_APS_D1(d_values, a_values, d_util ,A_d, theta, d2_opt, N = 1000, burni
   d1_sim[0] = np.random.choice(d_values)
   a_sim = np.random.choice(a_values, p = A_d[d1_sim[0]]['p'])
   theta_sim = theta(d1_sim[0],a_sim)
-  d2_sim = d2_opt(d1 = d1_sim[0], theta = theta_sim)
+  d2_sim = d2_opt(d1 = d1_sim[0], theta = theta_sim, a1 = a_sim)
 
   for i in range(1,N):
 
@@ -295,16 +351,17 @@ def inner_APS_D1(d_values, a_values, d_util ,A_d, theta, d2_opt, N = 1000, burni
     ### draw new sample from theta
     theta_tilde = theta(d_tilde, a_tilde)
     ## draw optimal d2
-    d2_tilde = d2_opt(d1 = d_tilde, theta = theta_tilde)
+    d2_tilde = d2_opt(d1 = d_tilde, theta = theta_tilde, a1 = a_tilde)
 
     #input of D's utility: d1, theta, d2
-    num = d_util(d_tilde , theta_tilde , d2_tilde)
-    den = d_util(d1_sim[i-1], theta_sim, d2_sim)
+    num = d_util(d1 = d_tilde , theta = theta_tilde , d2 = d2_tilde, a1 = a_tilde)
+    den = d_util(d1 = d1_sim[i-1], theta = theta_sim, d2 = d2_sim, a1 = a_sim)
 
     if np.random.uniform() <= num/den:
         d1_sim[i] = d_tilde
         theta_sim = theta_tilde
         d2_sim = d2_tilde
+        a_sim = a_tilde
     else:
       d1_sim[i] = d1_sim[i-1]
 
